@@ -1,0 +1,1 @@
+"./fatfs/ff.obj" "./fatfs/option/unicode.obj" "./utils.obj" "./startup_ccs.obj" "./sdcard.obj" "./mmc.obj" "./main.obj" "./io.obj" -l"libc.a" -l"D:/StellarisWare/boards/ek-lm3s9b92/TestFAT/ccs/../../../../driverlib/ccs/Debug/driverlib.lib" "../lm3s9b92.cmd" 
