@@ -32,13 +32,26 @@ void init_pins()
 	//TODO: Initialize LCD pins
 
 	//Port E - SSI1 , VS0_BSYNC, VS0_RESET, VS0_DREQ, VS0_CS
-
-	//TODO: Initialize SSI1 module
-	//TODO: Initialize VS0 Decoder pins
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+	//Set Output: VS_CLK, VS0_CS, VS_MOSI, VS0_BSYNC, VS0_RESET
+	GPIOSetOutput(GPIO_PORTE_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_6);
+	//Set Input: VS_MISO, VS0_DREQ
+	GPIOSetInput(GPIO_PORTE_BASE, GPIO_PIN_2 | GPIO_PIN_5);
+	//Initialize Pins: VS_CLK <- LOW, VS0_CS <- HIGH, VS_MOSI <- LOW, VS0_BSYNC <- HIGH, VS0_RESET <- LOW,
+	GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_6, GPIO_PIN_1 | GPIO_PIN_4);
+	//Set VS_CLK, VS_MOSI, VS_MISO as SSI pins
+	GPIOPinTypeSSI(GPIO_PORTE_BASE, GPIO_PIN_0 | GPIO_PIN_2 | GPIO_PIN_3);
 
 	//Port F -VS1_BSYNC, VS1_RESET, VS1_DREQ, VS1_CS
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	//Set Output: VS1_RESET, VS1_BSYNC, VS1_CS
+	GPIOSetOutput(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_2 | GPIO_PIN_3);
+	//Set Input: VS1_DREQ
+	GPIOSetInput(GPIO_PORTF_BASE, GPIO_PIN_1);
+	//Initialize Pins: VS0_RESET <- LOW,  VS0_BSYNC <- HIGH, VS1_CS <- HIGH
+	GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_0 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_PIN_2 | GPIO_PIN_3);
 
-	//TODO: Initialize VS1 Decoder pins
+	return;
 
 }
 
@@ -55,9 +68,22 @@ void init_periph()
 	SSIDataPut(SSI0_BASE, 0xff);
 	SSIDataPut(SSI0_BASE, 0xff);
 
+	//Initialize SSI1 - VS Decoders
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
+	SysCtlPeripheralReset(SYSCTL_PERIPH_SSI1);
+
+	SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, SysCtlClockGet()/4, 8);
+	SSIEnable(SSI1_BASE);
+
+	SSIDataPut(SSI1_BASE, 0xff);
+	SSIDataPut(SSI1_BASE, 0xff);
+	SSIDataPut(SSI1_BASE, 0xff);
+
 	//Initialize I2C0 - RTC
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
 	SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
+
+	return;
 }
 
 void GPIOSetOutput(unsigned long port, unsigned char pins)
