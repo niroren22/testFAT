@@ -112,6 +112,8 @@ void delay_ms(unsigned long ms)
   return;
 }
 
+//   ************************** SD card SSI functions implementation ****************************
+
 void ssi_wait(void)
 {
   unsigned long r;
@@ -193,6 +195,72 @@ void ssi_off(void)
 void ssi_on(void)
 {
   GPIOPinTypeSSI(GPIO_PORTA_BASE, GPIO_PIN_2 | GPIO_PIN_5); //SCK, SI = ssi
+
+  return;
+}
+
+
+//   ************************** VS Decoders SSI functions implementation ****************************
+
+void vs_ssi_wait(void)
+{
+  unsigned long r;
+
+  while(HWREG(SSI1_BASE + SSI_O_SR) & SSI_SR_BSY);  //busy?
+  //while(!(HWREG(SSI0_BASE + SSI_O_SR) & SSI_SR_TFE));  //transmit fifo empty?
+
+  while(SSIDataGetNonBlocking(SSI1_BASE, &r)); //clear receive fifo
+
+  return;
+}
+
+void vs_ssi_writewait(void)
+{
+  while(HWREG(SSI1_BASE + SSI_O_SR) & SSI_SR_BSY);  //busy?
+
+  return;
+}
+
+
+void vs_ssi_write(unsigned char c)
+{
+  SSIDataPut(SSI1_BASE, c);
+
+  return;
+}
+
+
+unsigned char vs_ssi_readwrite(unsigned char c)
+{
+  unsigned long r;
+
+  SSIDataPut(SSI1_BASE, c);
+  SSIDataGet(SSI1_BASE, &r);
+
+  return (unsigned char)r;
+}
+
+
+void vs_ssi_speed(unsigned long speed)
+{
+  unsigned long clk;
+
+  clk = SysCtlClockGet();
+
+  if((speed == 0) ||
+     (speed > (clk/2)))
+  {
+    speed = clk/2;
+  }
+
+  if(speed > SSI_SPEED)
+  {
+    speed = SSI_SPEED;
+  }
+
+  SSIDisable(SSI1_BASE);
+  SSIConfigSetExpClk(SSI1_BASE, clk, SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, speed, 8);
+  SSIEnable(SSI1_BASE);
 
   return;
 }

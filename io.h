@@ -53,12 +53,21 @@ void GPIOSetInput(unsigned long port, unsigned char pins);
 
 void delay_ms(unsigned long ms);
 
-void ssi_wait(void);
-void ssi_write(unsigned char c);
-unsigned char ssi_read(void);
-unsigned char ssi_readwrite(unsigned char c);
-void ssi_speed(unsigned long speed);
-void ssi_off(void);
-void ssi_on(void);
+
+//SD card SSI functions
+void 			ssi_wait(void);
+void 			ssi_write(unsigned char c);
+unsigned char 	ssi_read(void);
+unsigned char   ssi_readwrite(unsigned char c);
+void 			ssi_speed(unsigned long speed);
+void		    ssi_off(void);
+void		    ssi_on(void);
+
+//VS Decoder SSI Functions
+void            vs_ssi_wait(void);
+void            vs_ssi_writewait(void);
+void            vs_ssi_write(unsigned char c);
+unsigned char   vs_ssi_readwrite(unsigned char c);
+void            vs_ssi_speed(unsigned long speed);
 
 #endif /* IO_H_ */
